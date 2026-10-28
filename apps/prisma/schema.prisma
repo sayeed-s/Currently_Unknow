@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionType {
+  TOP_UP
+  PURCHASE
+  CREATOR_EARNING
+}
+
+enum AccessType {
+  RENT // 48-Hour Rental Access
+  LIFETIME // Permanent Lifetime Access
+}
+
+model User {
+  id             String          @id @default(uuid())
+  clerkId        String          @unique
+  username       String?
+  email          String?
+  imageUrl       String?
+  creatorProfile CreatorProfile?
+  wallet         Wallet?
+  purchases      Purchase[]
+  videoProgress  VideoProgress[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([clerkId])
+  @@map("users")
+}
+
+model Wallet {
+  id                 String               @id @default(uuid())
+  userId             String               @unique
+  user               User                 @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  walletBalance      Decimal              @default(0.00) @db.Decimal(15, 2)
+  walletTransactions WalletTransactions[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([userId])
+  @@map("wallet")
+}
+
+model WalletTransactions {
+  id          String          @id @default(uuid())
+  walletId    String
+  wallet      Wallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amount      Decimal         @db.Decimal(10, 2)
+  type        TransactionType
+  referenceId String? // Razorpay Payment ID or Purchase ID
+  createdAt   DateTime        @default(now())
+
+  @@index([walletId])
+  @@map("wallet_transactions")
+}
+
+model CreatorProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+
+  // Payout preference ("UPI" or "BANK")
+  payoutMethod String  @default("UPI")
+  upiId        String?
+
+  // Bank details
+  accountHolderName String?
+  accountNumber     String?
+  ifscCode          String?
+
+  // Creator verification
+  isVerified Boolean   @default(false)
+  channels   Channel[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("creator_profile")
+}
+
+model Channel {
+  id          String         @id @default(uuid())
+  creatorId   String
+  creator     CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  channelName String
+  bio         String?
+  videos      Video[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([creatorId])
+  @@map("channels")
+}
+
+model Video {
+  id            String          @id @default(uuid())
+  channelId     String
+  channel       Channel         @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  thumbnailUrl  String
+  cfVideoUid    String? // Cloudflare Stream Video UID for secure playback
+  rentPrice     Decimal         @db.Decimal(10, 2) // e.g., ₹5.00 for 48hr rent
+  buyPrice      Decimal         @db.Decimal(10, 2) // e.g., ₹49.00 for lifetime
+  isPublished   Boolean         @default(false)
+  purchases     Purchase[]
+  videoProgress VideoProgress[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([channelId])
+  @@index([isPublished])
+  @@map("videos")
+}
+
+model Purchase {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  videoId     String
+  video       Video      @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  accessType  AccessType @default(RENT)
+  pricePaid   Decimal    @db.Decimal(10, 2)
+  firstPlayed DateTime? // Timestamp when user hits play for the first time (for rentals)
+  expiresAt   DateTime? // Calculated expiration timestamp
+  createdAt   DateTime   @default(now())
+
+  @@unique([userId, videoId]) // A user can only have one active entry per video
+  @@index([userId])
+  @@index([videoId])
+  @@map("purchases")
+}
+
+model VideoProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  lastSeen  Int      @default(0) // Seconds watched
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, videoId]) // Allows tracking progress per user per video properly
+  @@index([userId])
+  @@map("video_progress")
+}
