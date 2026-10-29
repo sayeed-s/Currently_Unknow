@@ -4,7 +4,12 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { HomeIcon, SearchIcon, TvMinimalIcon } from "lucide-react";
+import {
+  HomeIcon,
+  SearchIcon,
+  TvMinimalIcon,
+  WalletMinimalIcon,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -19,6 +24,8 @@ import {
   SidebarMenuItem,
 } from "../ui/sidebar";
 import UserDropDown from "./userDropdown";
+import { Button } from "../ui/button";
+import WalletBalanceCard from "@/features/wallet/components/WalletbalanceCard";
 
 const menuItems = [
   {
@@ -110,7 +117,26 @@ const AppSidebar = () => {
       </SidebarContent>
       {/* Footer / User Dropdown */}
       <SidebarFooter>
-        <SidebarMenu>
+        <SidebarMenu className="space-y-4">
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip={"Wallet"}
+              isActive={pathname.includes("/wallet")}
+              asChild
+            >
+              <Link
+                href={"/wallet"}
+                className="flex items-center justify-between"
+                prefetch
+              >
+                <div className="flex items-center gap-2">
+                  <WalletMinimalIcon className="size-4" />
+                  <span className="font-medium">Wallet</span>
+                </div>
+                <WalletBalanceCard type="Badge" />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <UserDropDown />
           </SidebarMenuItem>
