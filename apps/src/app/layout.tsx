@@ -4,6 +4,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import React, { Suspense } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
+import QueryProvider from "@/provider/QueryProvider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -39,9 +41,14 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col dark" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col select-none " suppressHydrationWarning>
         <ClerkProvider>
-          <Suspense fallback={<p>Loading </p>}>{children}</Suspense>
+          <QueryProvider>
+            <Suspense fallback={<p>Loading </p>}>
+              {children}
+              <Toaster />
+            </Suspense>
+          </QueryProvider>
         </ClerkProvider>
       </body>
     </html>
