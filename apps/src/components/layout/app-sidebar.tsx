@@ -4,8 +4,11 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import {
   HomeIcon,
+  KeyboardMusicIcon,
+  PlusIcon,
   SearchIcon,
   TvMinimalIcon,
   WalletMinimalIcon,
@@ -24,8 +27,6 @@ import {
   SidebarMenuItem,
 } from "../ui/sidebar";
 import UserDropDown from "./userDropdown";
-import { Button } from "../ui/button";
-import WalletBalanceCard from "@/features/wallet/components/WalletbalanceCard";
 
 const menuItems = [
   {
@@ -52,6 +53,9 @@ const menuItems = [
 
 const AppSidebar = () => {
   const pathname = usePathname();
+  const { user, isLoaded } = useUser();
+
+  const isCreator = user?.publicMetadata?.role === "CREATOR";
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -64,7 +68,7 @@ const AppSidebar = () => {
               asChild
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Link href="/" prefetch>
+              <Link href="/home" prefetch>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
                   <Image
                     src="/vercel.svg"
@@ -85,6 +89,7 @@ const AppSidebar = () => {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       {/* Main Content */}
       <SidebarContent>
         {menuItems.map((group) => (
@@ -115,28 +120,55 @@ const AppSidebar = () => {
           </SidebarGroup>
         ))}
       </SidebarContent>
+
       {/* Footer / User Dropdown */}
       <SidebarFooter>
         <SidebarMenu className="space-y-4">
+          {/* Show Studio ONLY if data is loaded AND user is a creator */}
+          {isLoaded && isCreator && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip={"Studio"}
+                isActive={pathname.includes("/studio")}
+                asChild
+              >
+                <Link href={"/studio"} prefetch>
+                  <KeyboardMusicIcon className="size-4" />
+                  <span className="font-medium">Studio</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip={"Wallet"}
               isActive={pathname.includes("/wallet")}
               asChild
             >
-              <Link
-                href={"/wallet"}
-                className="flex items-center justify-between"
-                prefetch
-              >
-                <div className="flex items-center gap-2">
-                  <WalletMinimalIcon className="size-4" />
-                  <span className="font-medium">Wallet</span>
-                </div>
-                <WalletBalanceCard type="Badge" />
+              <Link href={"/wallet"} prefetch>
+                <WalletMinimalIcon className="size-4" />
+                <span className="font-medium">Wallet</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* Show "Be a Creator" ONLY if data is loaded AND user is NOT a creator */}
+          {isLoaded && !isCreator && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip={"Become a Creator"}
+                isActive={pathname.includes("/creator")}
+                asChild
+              >
+                <Link href={"/creator"} prefetch>
+                  <PlusIcon className="size-4" />
+                  <span className="font-medium">Launch Studio</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+
           <SidebarMenuItem>
             <UserDropDown />
           </SidebarMenuItem>

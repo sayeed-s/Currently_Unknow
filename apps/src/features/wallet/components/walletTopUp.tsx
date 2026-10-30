@@ -101,7 +101,7 @@ const WalletaTopUp = ({ walletId, onSuccess }: WalletaTopUpProps) => {
           }
         },
         prefill: {
-          name: "Fahadh Khan",
+          name: "Guest user",
         },
         theme: {
           color: "#2D2D2D",

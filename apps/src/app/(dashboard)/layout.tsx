@@ -13,7 +13,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
     <SidebarProvider>
       <TooltipProvider>
         <AppSidebar />
-        <SidebarInset className="bg-primary/10">
+        <SidebarInset>
           <AppHeader />
           {children}
         </SidebarInset>
