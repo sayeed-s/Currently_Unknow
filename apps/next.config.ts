@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["*.ngrok-free.app", "*.ngrok-free.dev", "*.ngrok.io"],
+  allowedDevOrigins: [
+    "*.ngrok-free.app",
+    " https://till-uneaten-hangover.ngrok-free.dev",
+    "*.ngrok-free.dev",
+    "*.ngrok.io",
+  ],
   /* config options here */
   experimental: {
     agentFeedback: true,

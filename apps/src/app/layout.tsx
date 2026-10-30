@@ -41,7 +41,10 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col select-none " suppressHydrationWarning>
+      <body
+        className="min-h-full flex flex-col select-none dark"
+        suppressHydrationWarning
+      >
         <ClerkProvider>
           <QueryProvider>
             <Suspense fallback={<p>Loading </p>}>
