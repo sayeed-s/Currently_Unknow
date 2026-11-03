@@ -57,7 +57,7 @@ const menuItems = [
 const AppSidebar = () => {
   const pathname = usePathname();
   const { user, isLoaded } = useUser();
-  const { toggleSidebar, state } = useSidebar();
+  const { toggleSidebar, state, isMobile } = useSidebar();
 
   const isCreator = user?.publicMetadata?.role === "CREATOR";
 
@@ -120,7 +120,7 @@ const AppSidebar = () => {
                           ? pathname === "/"
                           : pathname.startsWith(item.url)
                       }
-                      onClick={toggleSidebar}
+                      onClick={isMobile ? toggleSidebar : () => {}}
                       className="rounded-l"
                       tooltip={item.title}
                       asChild
@@ -148,7 +148,7 @@ const AppSidebar = () => {
                 tooltip={"Studio"}
                 isActive={pathname.includes("/studio")}
                 asChild
-                onClick={toggleSidebar}
+                onClick={isMobile ? toggleSidebar : () => {}}
                 className="rounded-l rounded-r-2xl"
               >
                 <Link href={"/studio"} prefetch>
@@ -164,7 +164,7 @@ const AppSidebar = () => {
               tooltip={"Wallet"}
               isActive={pathname.includes("/wallet")}
               asChild
-              onClick={toggleSidebar}
+              onClick={isMobile ? toggleSidebar : () => {}}
               className="rounded-l rounded-r-2xl"
             >
               <Link href={"/wallet"} prefetch>
@@ -181,7 +181,7 @@ const AppSidebar = () => {
                 tooltip={"Become a Creator"}
                 isActive={pathname.includes("/creator")}
                 asChild
-                onClick={toggleSidebar}
+                onClick={isMobile ? toggleSidebar : () => {}}
                 className="rounded-l rounded-r-2xl"
               >
                 <Link href={"/creator"} prefetch>

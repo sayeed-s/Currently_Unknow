@@ -4,8 +4,10 @@ const isPublichRoutes = createRouteMatcher([
   "/",
   "/auth(.*)",
   "/api/webhooks/clerk",
+  "/api/webhooks/mux",
   "/api/wallet(.*)",
   "/api/user(.*)",
+  "/api/studio(.*)",
   "/api/channel(.*)",
   "/api/imageuplod(.*)",
 ]);

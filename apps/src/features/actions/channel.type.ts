@@ -1,6 +1,11 @@
 import { api } from "@/lib/axios";
 import { ChannelFormValues } from "../form/channel/types";
-import { ChannelApiResponse } from "../channel/types/types";
+import {
+  ChannelApiResponse,
+  ChannelVideosApiResponse,
+  UserChannelViewApiResProps,
+  UserChannelViewProps,
+} from "../channel/types/types";
 
 export async function CreateChannel({
   userId,
@@ -25,7 +30,7 @@ export async function CreateChannel({
   return response;
 }
 
-export async function GetChannel<ChannelApiResponse>(
+export async function GetChannel(
   channelId: string,
 ): Promise<ChannelApiResponse> {
   if (!channelId) {
@@ -39,6 +44,34 @@ export async function GetChannel<ChannelApiResponse>(
     console.error(`Error fetching channel [${channelId}]:`, error);
     throw new Error(
       error?.response?.data?.message || "Failed to fetch channel details.",
+    );
+  }
+}
+
+export async function GetChannels(): Promise<UserChannelViewProps[]> {
+  try {
+    const res = await api.get<UserChannelViewApiResProps>("/channel");
+    return res.data.channels;
+  } catch (error: any) {
+    console.error("Error fetching the channels details", error.message);
+    throw new Error(
+      error?.response?.data?.message || "Failed to Fetch the channels details",
+    );
+  }
+}
+
+export async function GetChannelVideos(
+  chnId: string,
+): Promise<ChannelVideosApiResponse> {
+  try {
+    const res = await api.get<ChannelVideosApiResponse>(
+      `/channel/${chnId}/videos`,
+    );
+    return res.data;
+  } catch (error: any) {
+    console.error("Error fetching the channels videos", error.message);
+    throw new Error(
+      error?.response?.data?.message || "Failed to Fetch the channels videos",
     );
   }
 }

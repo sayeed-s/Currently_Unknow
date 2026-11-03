@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "t4.ftcdn.net",
+        hostname: "placeholder.com",
         pathname: "/**",
         port: "",
       },

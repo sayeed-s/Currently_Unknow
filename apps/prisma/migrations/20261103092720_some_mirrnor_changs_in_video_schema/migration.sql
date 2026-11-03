@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "videos" ALTER COLUMN "rentPrice" SET DEFAULT 0.00,
+ALTER COLUMN "buyPrice" SET DEFAULT 0.00;
