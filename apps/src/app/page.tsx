@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
   return (
-    <div className="flex-1 bg-primary flex items-center justify-center">
+    <div className="flex-1 flex items-center justify-center">
       show how page after sign-in
       <Link href={"/home"}>home page</Link>
     </div>

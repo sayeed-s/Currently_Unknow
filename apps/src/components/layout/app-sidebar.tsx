@@ -12,6 +12,7 @@ import {
   SearchIcon,
   TvMinimalIcon,
   WalletMinimalIcon,
+  X,
 } from "lucide-react";
 
 import {
@@ -25,6 +26,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "../ui/sidebar";
 import UserDropDown from "./userDropdown";
 
@@ -54,11 +57,12 @@ const menuItems = [
 const AppSidebar = () => {
   const pathname = usePathname();
   const { user, isLoaded } = useUser();
+  const { toggleSidebar, state } = useSidebar();
 
   const isCreator = user?.publicMetadata?.role === "CREATOR";
 
   return (
-    <Sidebar collapsible="icon" variant="sidebar">
+    <Sidebar collapsible="icon" variant="inset">
       {/* Header */}
       <SidebarHeader>
         <SidebarMenu>
@@ -68,23 +72,34 @@ const AppSidebar = () => {
               asChild
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Link href="/home" prefetch>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
-                  <Image
-                    src="/vercel.svg"
-                    alt="VST Logo"
-                    width={24}
-                    height={24}
-                    className="invert dark:invert-0"
-                  />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    onClick={state === "collapsed" ? toggleSidebar : () => {}}
+                    className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground"
+                  >
+                    <Image
+                      src="/vercel.svg"
+                      alt="VST Logo"
+                      width={24}
+                      height={24}
+                      className="invert dark:invert-0"
+                    />
+                  </div>
+                  <Link href="/home" prefetch className="flex gap-4">
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">VST</span>
+                      <span className="truncate text-xs text-muted-foreground">
+                        Media Platform
+                      </span>
+                    </div>
+                  </Link>
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">VST</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    Media Platform
-                  </span>
+
+                <div>
+                  <SidebarTrigger />
                 </div>
-              </Link>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -96,7 +111,7 @@ const AppSidebar = () => {
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="space-y-2">
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
@@ -105,6 +120,8 @@ const AppSidebar = () => {
                           ? pathname === "/"
                           : pathname.startsWith(item.url)
                       }
+                      onClick={toggleSidebar}
+                      className="rounded-l"
                       tooltip={item.title}
                       asChild
                     >
@@ -123,7 +140,7 @@ const AppSidebar = () => {
 
       {/* Footer / User Dropdown */}
       <SidebarFooter>
-        <SidebarMenu className="space-y-4">
+        <SidebarMenu className="space-y-2">
           {/* Show Studio ONLY if data is loaded AND user is a creator */}
           {isLoaded && isCreator && (
             <SidebarMenuItem>
@@ -131,6 +148,8 @@ const AppSidebar = () => {
                 tooltip={"Studio"}
                 isActive={pathname.includes("/studio")}
                 asChild
+                onClick={toggleSidebar}
+                className="rounded-l rounded-r-2xl"
               >
                 <Link href={"/studio"} prefetch>
                   <KeyboardMusicIcon className="size-4" />
@@ -145,6 +164,8 @@ const AppSidebar = () => {
               tooltip={"Wallet"}
               isActive={pathname.includes("/wallet")}
               asChild
+              onClick={toggleSidebar}
+              className="rounded-l rounded-r-2xl"
             >
               <Link href={"/wallet"} prefetch>
                 <WalletMinimalIcon className="size-4" />
@@ -160,6 +181,8 @@ const AppSidebar = () => {
                 tooltip={"Become a Creator"}
                 isActive={pathname.includes("/creator")}
                 asChild
+                onClick={toggleSidebar}
+                className="rounded-l rounded-r-2xl"
               >
                 <Link href={"/creator"} prefetch>
                   <PlusIcon className="size-4" />

@@ -1,5 +1,6 @@
 "use client";
 
+import CreatorStudio from "@/features/studio/components/studio";
 import { useUser } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -32,7 +33,11 @@ const page = () => {
   if (isUser) {
     return null;
   }
-  return <div className="px-4">Create a channel</div>;
+  return (
+    <div className="px-4">
+      <CreatorStudio />
+    </div>
+  );
 };
 
 export default page;

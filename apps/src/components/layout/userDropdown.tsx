@@ -40,7 +40,6 @@ const UserDropDown = () => {
     },
   ];
 
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,7 +54,7 @@ const UserDropDown = () => {
               alt={user?.fullName || "User Avatar"}
             />
             <AvatarFallback className="text-xs">
-              {user?.firstName ? user.firstName[0] : "U"}
+              {user?.firstName ? user.firstName[0] : "UM"}
             </AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
