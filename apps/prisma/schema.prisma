@@ -35,6 +35,8 @@ model User {
   videoProgress  VideoProgress[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  premiumUser    Boolean         @default(false)
+  channel        Channel[]
 
   @@index([clerkId])
   @@map("users")
@@ -91,14 +93,21 @@ model CreatorProfile {
 }
 
 model Channel {
-  id          String         @id @default(uuid())
-  creatorId   String
-  creator     CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  channelName String
-  bio         String?
-  videos      Video[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id                    String          @id @default(uuid())
+  creatorId             String
+  creator               CreatorProfile  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  channelName           String
+  channelImage          String
+  channelImagePublicId  String
+  channelPoster         String?
+  channelPosterPublicId String?
+  bio                   String?
+  videos                Video[]
+  joiningPrice          Decimal         @default(0.00) @db.Decimal(10, 2)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  posts                 CommunityPost[]
+  user                  User[]
 
   @@index([creatorId])
   @@map("channels")
@@ -111,7 +120,7 @@ model Video {
   title         String
   description   String?
   thumbnailUrl  String
-  cfVideoUid    String? // Cloudflare Stream Video UID for secure playback
+  muxVideoUid    String? // Cloudflare Stream Video UID for secure playback
   rentPrice     Decimal         @db.Decimal(10, 2) // e.g., ₹5.00 for 48hr rent
   buyPrice      Decimal         @db.Decimal(10, 2) // e.g., ₹49.00 for lifetime
   isPublished   Boolean         @default(false)
@@ -155,4 +164,17 @@ model VideoProgress {
   @@unique([userId, videoId]) // Allows tracking progress per user per video properly
   @@index([userId])
   @@map("video_progress")
+}
+
+model CommunityPost {
+  id            String   @id @default(uuid())
+  title         String?
+  imageurl      String?
+  imagePublicId String?
+  channelId     String
+  channel       Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+
+  @@index([channelId])
+  @@map("community_posts")
 }
