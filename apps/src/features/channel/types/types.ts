@@ -12,3 +12,35 @@ export interface ChannelApiResponse {
   message: string;
   channel: channelProps;
 }
+
+export interface UserChannelViewApiResProps {
+  success: boolean;
+  message: string;
+  channels: UserChannelViewProps[];
+}
+
+export interface UserChannelViewProps {
+  id: string;
+  channelName: string;
+  bio: string;
+  channelImage: string;
+  joiningPrice: string;
+}
+
+export interface ChannelVideosApiResponse {
+  success: boolean;
+  message: string;
+  videos: ChannelVideoProps[];
+}
+
+export interface ChannelVideoProps {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  isIntro: boolean;
+  duration: number;
+  rentPrice: string;
+  buyPrice: string;
+  createdAt: Date;
+}

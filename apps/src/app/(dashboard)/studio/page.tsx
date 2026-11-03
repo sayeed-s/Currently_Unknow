@@ -34,7 +34,7 @@ const page = () => {
     return null;
   }
   return (
-    <div className="px-4">
+    <div className="p-4">
       <CreatorStudio />
     </div>
   );

@@ -49,7 +49,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       for (const file of Array.from(files)) {
         // 1. Fetch signature and timestamps from your backend
-        const presignRes = await api.get("/imageuplod/presigned");
+        const presignRes = await api.get("/upload/presigned");
         const { signature, timestamp, folder, apiKey, cloudName } =
           presignRes.data;
 

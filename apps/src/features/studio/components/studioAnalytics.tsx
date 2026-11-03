@@ -1,4 +1,5 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { formatAmount } from "@/lib/currencyFormator";
 import {
   ClapperboardIcon,
   CoinsIcon,
@@ -6,50 +7,31 @@ import {
   HandCoinsIcon,
 } from "lucide-react";
 import React from "react";
+import { StudioAnalyticsProps } from "../studio.type";
 
 // Formatting helper function
-const formatAmount = (value: number, isCurrency: boolean = true) => {
-  if (value >= 1_000_000) {
-    return (value / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
-  }
-  if (value >= 1_000) {
-    return (value / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
-  }
 
-  // For numbers under 1,000, use standard commas (e.g., 850 or 2,342)
-  return isCurrency
-    ? `₹${value.toLocaleString("en-IN")}`
-    : value.toLocaleString("en-IN");
-};
-
-// Alternative: If you want Indian numbering with commas everywhere (e.g., 2,34,878 instead of 234.8K):
-const formatWithCommas = (value: number, isCurrency: boolean = true) => {
-  return isCurrency
-    ? `₹${value.toLocaleString("en-IN")}`
-    : value.toLocaleString("en-IN");
-};
-
-const StudioAnalytics = () => {
+const StudioAnalytics = ({ Lifetime, TotalVideos }: StudioAnalyticsProps) => {
   const analyticsCard = [
     {
       id: 1,
       title: "Life-Time Earnings",
       icons: DollarSignIcon,
-      data: 234878,
+      data: Lifetime,
       isCurrency: true,
     },
-    {
-      id: 2,
-      title: "Monthly Earnings",
-      icons: HandCoinsIcon,
-      data: 23422,
-      isCurrency: true,
-    },
+    // {
+    //   id: 2,
+    //   title: "Monthly Earnings",
+    //   icons: HandCoinsIcon,
+    //   data: 23422,
+    //   isCurrency: true,
+    // },
     {
       id: 3,
       title: "Total Videos",
       icons: ClapperboardIcon,
-      data: 10,
+      data: TotalVideos,
       isCurrency: false,
     },
   ];
