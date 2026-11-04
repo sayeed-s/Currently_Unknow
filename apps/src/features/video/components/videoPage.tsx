@@ -44,7 +44,7 @@ const VideoCardPage: React.FC<VideoCardPageProps> = ({ videoId }) => {
         <VideoPlayer
           playbackId={muxPlaybackId}
           posterUrl={thumbnailUrl || undefined}
-          className="shadow-2xl border border-border/40 w-full"
+          className="shadow-2xl border min-w-5xl border-border/40 w-full"
         />
       ) : (
         <div className="w-full aspect-video rounded-xl bg-muted/40 border border-border/40 flex items-center justify-center text-muted-foreground text-sm">
@@ -66,7 +66,7 @@ const VideoCardPage: React.FC<VideoCardPageProps> = ({ videoId }) => {
 
 // Premium Skeleton Loader for smooth transitions
 const VideoCardPageSkeleton = () => (
-  <div className="space-y-6 w-full max-w-5xl mx-auto">
+  <div className="space-y-6 min-w-5xl max-w-5xl mx-auto">
     <div className="relative w-full aspect-video rounded-xl bg-muted/40 border border-border/40 flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-primary" />
     </div>

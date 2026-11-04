@@ -36,3 +36,9 @@ export function formatTimeAgo(dateInput: string | Date): string {
 
   return "Just now";
 }
+
+export function GenrateExpiry() {
+  const date = new Date();
+  date.setHours(date.getHours() + 48);
+  return date;
+}

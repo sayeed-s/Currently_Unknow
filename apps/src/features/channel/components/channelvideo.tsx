@@ -6,16 +6,18 @@ import { GetChannelVideos } from "@/features/actions/channel.action";
 import { ChannelVideosApiResponse } from "../types/types";
 import VideoCard from "@/features/video/components/videocard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@clerk/nextjs";
 
 interface ChannelVideoProps {
   channelId: string;
 }
 
 const ChannelVideo: React.FC<ChannelVideoProps> = ({ channelId }) => {
+  const { userId, isLoaded } = useAuth();
   const { data, isLoading, isError } = useQuery<ChannelVideosApiResponse>({
     queryKey: ["channel_videos", channelId],
-    queryFn: () => GetChannelVideos(channelId),
-    enabled: !!channelId,
+    queryFn: () => GetChannelVideos(channelId, userId as string),
+    enabled: isLoaded && !!channelId && !!userId,
   });
 
   if (isLoading) {

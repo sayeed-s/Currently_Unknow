@@ -1,36 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils"; // Adjusted to standard lib cn import if applicable
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { GetChannel } from "@/features/actions/channel.action";
-import { Loader2 } from "lucide-react";
+import { CoinsIcon, Loader2, UserCheck, UserPlus } from "lucide-react";
 import { ChannelApiResponse } from "../types/types";
+import { useAuth } from "@clerk/nextjs";
+import { api } from "@/lib/axios";
+import MultiUseDialog from "@/features/components/MultiUseDialog";
+import { WalletPayModal } from "@/features/wallet/components/walletPayModel";
+import LeaveChannelModal from "./leaveChannel";
+import LockedChannelView from "@/features/components/lockChannelView";
 
-interface ChannelProps {
+interface ChannelViewProps {
   children: React.ReactNode;
 }
 
-const Channel = ({ children }: ChannelProps) => {
+const Channel = ({ children }: ChannelViewProps) => {
   const params = useParams<{ chnId: string }>();
   const channelId = params.chnId;
-  // const params = useParams();
+  const { userId, isLoaded } = useAuth();
   const path = usePathname();
   const router = useRouter();
-  const [isBioExpanded, setIsBioExpanded] = useState(false);
 
-  // Fetch channel data using the real channelId prop
-  const { data, isLoading } = useQuery<ChannelApiResponse>({
-    queryKey: ["channel", channelId],
-    queryFn: () => GetChannel(channelId),
-    enabled: !!channelId,
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+
+  const { data, isLoading, refetch } = useQuery<ChannelApiResponse>({
+    queryKey: ["channel", channelId, userId],
+    queryFn: () => GetChannel(channelId, userId as string),
+    enabled: !!channelId && !!userId && isLoaded,
   });
 
   const channel = data?.channel;
+  const price = Number(channel?.joiningPrice || 0);
+
+  // Sync subscription state when query data updates
+  useEffect(() => {
+    if (channel?.isSubscribed !== undefined) {
+      setIsSubscribed(channel.isSubscribed);
+    }
+  }, [channel?.isSubscribed]);
 
   if (isLoading) {
     return (
@@ -40,6 +58,64 @@ const Channel = ({ children }: ChannelProps) => {
     );
   }
 
+  if (!channel) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-4">
+        <p className="text-muted-foreground">
+          Channel not found or unavailable.
+        </p>
+        <Button onClick={() => router.push("/")}>Back to Home</Button>
+      </div>
+    );
+  }
+
+  const handleChnJoin = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!userId) {
+      toast.error("Please sign in to join channels.");
+      return;
+    }
+
+    if (isSubscribed) {
+      setIsLeaveModalOpen(true);
+      return;
+    }
+
+    // If channel costs coins and user is NOT already subscribed, trigger wallet payment modal
+    if (price > 0 && !isSubscribed) {
+      setIsPayModalOpen(true);
+      return;
+    }
+
+    // Otherwise, handle free join or leave (toggle) directly via API
+    try {
+      setIsActionLoading(true);
+      const res = await api.post("/channel/join", {
+        userId,
+        channelId: channel.id,
+      });
+
+      if (res.data.success) {
+        setIsSubscribed(res.data.isSubscribed);
+        toast.success(res.data.message);
+        refetch();
+      }
+    } catch (error: any) {
+      console.error("Failed to join channel:", error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setIsSubscribed(true);
+    setIsPayModalOpen(false);
+    toast.success("Successfully joined the channel!");
+    refetch();
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 pt-4 pb-12">
       {/* Channel Poster Banner */}
@@ -47,7 +123,7 @@ const Channel = ({ children }: ChannelProps) => {
         className={cn(
           "w-full h-44 md:h-52 rounded-2xl bg-muted relative overflow-hidden flex items-center justify-center",
           !channel?.channelPoster &&
-            "bg-linear-to-br from-violet-500 via-pink-500 to-orange-600 text-white font-medium",
+            "bg-Linear-to-br from-violet-500 via-pink-500 to-orange-600 text-white font-medium",
         )}
       >
         {channel?.channelPoster ? (
@@ -101,19 +177,37 @@ const Channel = ({ children }: ChannelProps) => {
             )}
 
             <Button
-              onClick={() => {
-                toast.success(`Joined ${channel?.channelName || "channel"}`);
-              }}
+              onClick={handleChnJoin}
+              disabled={isActionLoading}
+              variant={isSubscribed ? "secondary" : "default"}
               className={cn(
-                "min-w-40 cursor-pointer mt-2",
-                Number(channel?.joiningPrice) < 0
-                  ? "bg-green-400"
-                  : "bg-blue-400",
+                "rounded-full px-5 font-semibold transition-all duration-200",
+                isSubscribed
+                  ? "bg-muted text-foreground hover:bg-muted/80 border border-border/60"
+                  : "bg-primary text-primary-foreground shadow-sm",
               )}
             >
-              {Number(channel?.joiningPrice) <= 0
-                ? "Join Free"
-                : `Join for ${Number(channel?.joiningPrice)}`}
+              {isActionLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+              ) : isSubscribed ? (
+                <UserCheck className="w-4 h-4 mr-1.5 text-emerald-500" />
+              ) : (
+                <UserPlus className="w-4 h-4 mr-1.5" />
+              )}
+
+              <span className="flex items-center gap-1">
+                {isSubscribed ? (
+                  "Joined"
+                ) : price <= 0 ? (
+                  "Join Free"
+                ) : (
+                  <>
+                    <span>Join for</span>
+                    <CoinsIcon className="size-4 text-[#C6A15B]" />
+                    {price}
+                  </>
+                )}
+              </span>
             </Button>
           </div>
         </div>
@@ -144,7 +238,52 @@ const Channel = ({ children }: ChannelProps) => {
       </div>
 
       {/* Nested Page Content */}
-      <div className="mt-6">{children}</div>
+      {isSubscribed && <div className="mt-6">{children}</div>}
+      {!isSubscribed && (
+        <LockedChannelView
+          onJoinClick={handleChnJoin}
+          channelName={channel.channelName}
+          price={Number(channel.joiningPrice)}
+        />
+      )}
+
+      {/* Wallet Payment Modal Dialog */}
+      <MultiUseDialog
+        title={`Join channel ${channel.channelName}`}
+        description="join your favorite creator channel"
+        open={isPayModalOpen}
+        onOpenChange={setIsPayModalOpen}
+      >
+        <WalletPayModal
+          amount={price}
+          title={`Join ${channel.channelName}`}
+          userId={userId as string}
+          targetId={channel.id}
+          type="CHANNEL_JOIN"
+          onSuccess={handlePaymentSuccess}
+        />
+      </MultiUseDialog>
+
+      {/* Leave Channel Warning Modal Dialog */}
+      <MultiUseDialog
+        title="Leave Channel"
+        description="Review terms before leaving this channel."
+        open={isLeaveModalOpen}
+        onOpenChange={setIsLeaveModalOpen}
+      >
+        <LeaveChannelModal
+          channelId={channel.id}
+          channelName={channel.channelName}
+          joiningPrice={Number(channel.joiningPrice)}
+          userId={userId as string}
+          onCancel={() => setIsLeaveModalOpen(false)}
+          onSuccess={() => {
+            setIsSubscribed(false);
+            setIsLeaveModalOpen(false);
+            router.refresh();
+          }}
+        />
+      </MultiUseDialog>
     </div>
   );
 };

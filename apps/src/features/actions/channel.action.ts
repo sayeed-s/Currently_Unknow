@@ -32,13 +32,16 @@ export async function CreateChannel({
 
 export async function GetChannel(
   channelId: string,
+  userId: string,
 ): Promise<ChannelApiResponse> {
   if (!channelId) {
     throw new Error("channelId is required");
   }
 
   try {
-    const res = await api.get<ChannelApiResponse>(`/channel/${channelId}`);
+    const res = await api.get<ChannelApiResponse>(
+      `/channel/${channelId}?userId=${userId}`,
+    );
     return res.data;
   } catch (error: any) {
     console.error(`Error fetching channel [${channelId}]:`, error);
@@ -66,10 +69,11 @@ export async function GetChannels(
 
 export async function GetChannelVideos(
   chnId: string,
+  userId: string,
 ): Promise<ChannelVideosApiResponse> {
   try {
     const res = await api.get<ChannelVideosApiResponse>(
-      `/channel/${chnId}/videos`,
+      `/channel/${chnId}/videos?userId=${userId}`,
     );
     return res.data;
   } catch (error: any) {

@@ -8,7 +8,6 @@ export async function getWalletDetails(
   walletId: string,
   includeTransactions: boolean = false,
 ): Promise<WalletResponse> {
-  // Axios automatically appends baseURL (/api) -> /api/wallet/[walletId]
   const response = await api.get<WalletResponse>(
     `/wallet/${walletId}?transactions=${includeTransactions}`,
   );
