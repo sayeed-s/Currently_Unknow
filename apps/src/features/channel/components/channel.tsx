@@ -7,7 +7,7 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils"; // Adjusted to standard lib cn import if applicable
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { GetChannel } from "@/features/actions/channel.type";
+import { GetChannel } from "@/features/actions/channel.action";
 import { Loader2 } from "lucide-react";
 import { ChannelApiResponse } from "../types/types";
 
@@ -41,7 +41,7 @@ const Channel = ({ children }: ChannelProps) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 pb-12">
+    <div className="w-full max-w-7xl mx-auto px-4 pt-4 pb-12">
       {/* Channel Poster Banner */}
       <div
         className={cn(
@@ -65,14 +65,11 @@ const Channel = ({ children }: ChannelProps) => {
 
       {/* Channel Header Information */}
       <div className="flex flex-col space-y-6 border-b py-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div className="flex flex-col min-[375px]:flex-row items-start sm:items-center gap-6">
           {/* Circular Channel Avatar */}
           <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-md bg-muted shrink-0">
             <Image
-              src={
-                channel?.channelImage ||
-                "https://t4.ftcdn.net/jpg/21/60/45/55/240_F_2160455551_K7sBKVfXLBnd4xvCRTh8ODd5ZpAJNZDN.jpg"
-              }
+              src={channel?.channelImage || "/vercel.svg"}
               alt={channel?.channelName || "Channel avatar"}
               fill
               className="object-cover"

@@ -4,7 +4,6 @@ export const StudiDashbord = async (studioId: string) => {
   if (!studioId) {
     throw new Error("studioId is required");
   }
-
   try {
     const res = await api.get(`/studio/${studioId}`);
     return res.data;
