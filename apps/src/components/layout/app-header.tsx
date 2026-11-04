@@ -42,7 +42,9 @@ export const AppHeader = () => {
         <div className="flex items-center gap-2">
           <span className="h-4 w-px bg-border/60 hidden sm:inline-block" />
           <h1 className="font-semibold capitalize text-base sm:text-lg tracking-tight text-foreground">
-            {formattedTitle}
+            {formattedTitle === "channel"
+              ? "Discover Channels"
+              : formattedTitle}
           </h1>
         </div>
       </div>

@@ -8,7 +8,7 @@ import MultiUseDialog from "@/features/components/MultiUseDialog";
 import ChannelCreationForm from "@/features/form/channel/channelCreateForm";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
-import { StudiDashbord } from "@/features/actions/studio.types";
+import { StudiDashbord } from "@/features/actions/studio.action";
 import { channelProps } from "@/features/channel/types/types";
 import { StudioVideoProps } from "../studio.type";
 import VideoCreationForm from "@/features/form/video/videoCreationForm";
@@ -28,7 +28,7 @@ const CreatorStudio = () => {
   if (isLoading) {
     return (
       <div>
-        <p>Loading channels</p>
+        <p>Loading Studio data</p>
       </div>
     );
   }

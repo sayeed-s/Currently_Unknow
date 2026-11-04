@@ -92,7 +92,7 @@ export const VideoCreationForm: React.FC<VideoCreationFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 max-w-3xl mx-auto p-6 lg:p-8 bg-card border rounded-2xl shadow-sm"
+      className="space-y-8 max-w-3xl mx-auto p-6 lg:p-8 border rounded-2xl shadow-sm"
     >
       {/* Header */}
       <div className="border-b pb-4 space-y-1">

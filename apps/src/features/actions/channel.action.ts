@@ -48,9 +48,13 @@ export async function GetChannel(
   }
 }
 
-export async function GetChannels(): Promise<UserChannelViewProps[]> {
+export async function GetChannels(
+  userId: string,
+): Promise<UserChannelViewProps[]> {
   try {
-    const res = await api.get<UserChannelViewApiResProps>("/channel");
+    const res = await api.get<UserChannelViewApiResProps>(
+      `/channel?userId=${userId}`,
+    );
     return res.data.channels;
   } catch (error: any) {
     console.error("Error fetching the channels details", error.message);

@@ -5,6 +5,7 @@ export interface channelProps {
   channelPoster: string;
   channelImage: string;
   createdAt: Date;
+  isSubscribed: boolean;
   joiningPrice: string;
 }
 export interface ChannelApiResponse {
@@ -24,6 +25,7 @@ export interface UserChannelViewProps {
   channelName: string;
   bio: string;
   channelImage: string;
+  isSubscribed: boolean;
   joiningPrice: string;
 }
 

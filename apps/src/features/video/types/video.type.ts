@@ -23,3 +23,20 @@ export const videoFormSchema = z.object({
 });
 
 export type VideoFormValues = z.infer<typeof videoFormSchema>;
+
+export interface VideoApiResponseProps {
+  success: boolean;
+  message: string;
+  video: VideoProps;
+}
+
+export interface VideoProps {
+  id: string;
+  title: string;
+  description: string;
+  muxPlaybackId: string;
+  thumbnailUrl: string;
+  rentPrice: string;
+  buyPrice: string;
+  isLocked: boolean;
+}

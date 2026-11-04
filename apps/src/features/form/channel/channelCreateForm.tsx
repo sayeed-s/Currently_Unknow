@@ -15,7 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/axios";
-import { CreateChannel } from "@/features/actions/channel.type";
+import { CreateChannel } from "@/features/actions/channel.action";
 
 interface ChannelCreationFormProps {
   userId: string;

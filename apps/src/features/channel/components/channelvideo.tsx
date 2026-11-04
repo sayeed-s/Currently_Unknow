@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GetChannelVideos } from "@/features/actions/channel.type";
+import { GetChannelVideos } from "@/features/actions/channel.action";
 import { ChannelVideosApiResponse } from "../types/types";
 import VideoCard from "@/features/video/components/videocard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,9 +47,6 @@ const ChannelVideo: React.FC<ChannelVideoProps> = ({ channelId }) => {
       {/* 1. Featured Channel Intro / Trailer Video */}
       {introVideo && (
         <div className="space-y-3 pb-8 border-b border-border/40">
-          <h2 className="text-base font-semibold tracking-tight text-foreground">
-            Channel Trailer
-          </h2>
           <div className="max-w-4xl">
             <VideoCard video={introVideo} intro={true} />
           </div>

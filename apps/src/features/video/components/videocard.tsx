@@ -7,6 +7,7 @@ import React from "react";
 import { CoinsIcon } from "lucide-react";
 import { formatTimeAgo } from "@/lib/dateFormated";
 import { cn } from "cn";
+import { useRouter } from "next/navigation";
 
 interface VideoCardProps {
   video: ChannelVideoProps;
@@ -19,10 +20,10 @@ const VideoCard = ({ video, intro, onClick }: VideoCardProps) => {
   const formattedBuy = video.buyPrice
     ? Number(video.buyPrice).toFixed(2)
     : null;
-
+  const router = useRouter();
   return (
     <Card
-      onClick={onClick}
+      onClick={() => router.push(`/watch/${video.id}`)}
       className={cn(
         "group flex flex-col  w-full overflow-hidden px-2 py-2 sm:p-2 border-none bg-transparent shadow-none hover:bg-muted-foreground/10 cursor-pointer rounded-xl ring-0 gap-2.5 transition-all",
         intro && "sm:flex-row",
@@ -70,19 +71,22 @@ const VideoCard = ({ video, intro, onClick }: VideoCardProps) => {
         </p>
 
         {/* Details & Monetization Badges */}
-        <div className="flex items-center justify-between sm:justify-start text-xs text-muted-foreground pt-1">
+        <div className="flex items-center md:space-y-2 md:flex-col md:items-start justify-between sm:justify-start text-xs text-muted-foreground pt-1">
           {video.createdAt && (
             <span className="text-[12px]">
               {formatTimeAgo(video.createdAt)}
             </span>
           )}
 
-          <div className="flex items-center gap-1.5 ml-auto">
+          <div className="flex items-center gap-1.5 ml-auto md:ml-0">
             {video.rentPrice !== undefined && (
-              <span className="inline-flex items-center font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded text-[11px] gap-2">
-                <CoinsIcon className="size-4 text-[#C6A15B]" />
-                {formattedRent}
-              </span>
+              <p className="flex items-center tracking-wider gap-2">
+                Rent:
+                <span className="inline-flex items-center font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded text-[11px] gap-2">
+                  <CoinsIcon className="size-4 text-[#C6A15B]" />
+                  {formattedRent}
+                </span>
+              </p>
             )}
           </div>
         </div>
