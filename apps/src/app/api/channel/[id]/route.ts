@@ -7,17 +7,21 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+
     if (!id) {
-      return NextResponse.json({
-        success: false,
-        message: "channel id is requried to fetch details",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Channel id is required to fetch details",
+        },
+        { status: 400 },
+      );
     }
 
-    const channel = await prisma.channel.findUnique({
-      where: {
-        id,
-      },
+    const rawChannel = await prisma.channel.findUnique({
+      where: { id },
       select: {
         id: true,
         channelName: true,
@@ -26,18 +30,40 @@ export async function GET(
         channelImage: true,
         createdAt: true,
         joiningPrice: true,
+        user: userId
+          ? {
+              where: { clerkId: userId },
+              select: { clerkId: true },
+            }
+          : false,
       },
     });
+
+    if (!rawChannel) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Channel not found",
+        },
+        { status: 404 },
+      );
+    }
+
+    const { user, ...channelData } = rawChannel;
+    const isSubscribed = userId
+      ? Array.isArray(user) && user.length > 0
+      : false;
 
     return NextResponse.json(
       {
         success: true,
         message: "Channel Details",
-        channel,
+        channel: {
+          ...channelData,
+          isSubscribed,
+        },
       },
-      {
-        status: 200,
-      },
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("Error while getting channel details:", error.message);

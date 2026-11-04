@@ -3,7 +3,7 @@ import React from "react";
 
 const page = () => {
   return (
-    <div>
+    <div className="py-4 px-2">
       <WalletBalanceCard />
     </div>
   );

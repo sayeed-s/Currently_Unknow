@@ -45,7 +45,7 @@ export const StudioVideos: React.FC<StudioVideosProps> = ({
   const totalEarnings = Number(video.totalEarnings || 0).toFixed(2);
 
   return (
-    <Card className="overflow-hidden pb-0 pt-3 border border-border/60 hover:border-border bg-card/60 backdrop-blur-sm transition-all duration-200 hover:shadow-md group rounded-2xl">
+    <Card className="overflow-hidden ring-0 pb-0 pt-3 border border-border/60 hover:border-border bg-card/60 backdrop-blur-sm transition-all duration-200 hover:shadow-md group rounded-2xl">
       <CardContent className="px-4 sm:p-5">
         <div className="flex flex-col sm:flex-row gap-4 items-start">
           {/* Thumbnail Container with Badges */}

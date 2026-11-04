@@ -14,8 +14,9 @@ datasource db {
 
 enum TransactionType {
   TOP_UP
-  PURCHASE
+  VIDEO_PURCHASE
   CREATOR_EARNING
+  CHANNEL_JOIN
 }
 
 enum AccessType {

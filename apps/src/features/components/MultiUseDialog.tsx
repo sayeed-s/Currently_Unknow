@@ -24,7 +24,7 @@ const MultiUseDialog = ({
 }: Props) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-2/3 overflow-y-auto scrollbar-none max-w-4xl w-fit">
+      <DialogContent className="max-h-2/3 overflow-y-auto scrollbar-none">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
