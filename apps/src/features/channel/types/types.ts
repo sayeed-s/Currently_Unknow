@@ -41,6 +41,7 @@ export interface ChannelVideoProps {
   description: string;
   thumbnailUrl: string;
   isIntro: boolean;
+  isPurchased: boolean;
   duration: number;
   rentPrice: string;
   buyPrice: string;

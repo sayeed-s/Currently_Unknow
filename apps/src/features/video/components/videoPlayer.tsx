@@ -76,7 +76,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <div
-      className={`relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-black max-w-7xl ${className}`}
+      className={`relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-black  ${className}`}
     >
       <MuxPlayer
         playbackId={playbackId}

@@ -164,7 +164,6 @@ model Purchase {
   expiresAt   DateTime? // Calculated expiration timestamp
   createdAt   DateTime   @default(now())
 
-  @@unique([userId, videoId]) // A user can only have one active entry per video
   @@index([userId])
   @@index([videoId])
   @@map("purchases")

@@ -28,8 +28,8 @@ const MultiUseDialog = ({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
-          <div className="py-4">{children}</div>
         </DialogHeader>
+        <div className="py-4">{children}</div>
       </DialogContent>
     </Dialog>
   );

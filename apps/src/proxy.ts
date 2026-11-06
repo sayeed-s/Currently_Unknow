@@ -10,6 +10,7 @@ const isPublichRoutes = createRouteMatcher([
   "/api/user(.*)",
   "/api/mux(.*)",
   "/api/studio(.*)",
+  "/api/purchases(.*)",
   "/api/channel(.*)",
   "/api/imageuplod(.*)",
 ]);

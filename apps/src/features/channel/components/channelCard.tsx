@@ -14,9 +14,10 @@ import { toast } from "sonner";
 import MultiUseDialog from "@/features/components/MultiUseDialog";
 import { WalletPayModal } from "@/features/wallet/components/walletPayModel";
 import LeaveChannelModal from "./leaveChannel";
+import { StudioChnnelProps } from "@/features/studio/studio.type";
 
 interface ChannelCardProps {
-  channel: channelProps | UserChannelViewProps;
+  channel: channelProps | UserChannelViewProps | StudioChnnelProps;
   userId: string;
   studio?: boolean;
 }

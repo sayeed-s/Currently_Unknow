@@ -42,3 +42,32 @@ export function GenrateExpiry() {
   date.setHours(date.getHours() + 48);
   return date;
 }
+
+export const formatVideoExpiry = (expiresAt: Date | string | null): string => {
+  if (!expiresAt) {
+    return "Lifetime Access";
+  }
+
+  const now = new Date().getTime();
+  const expiryTime = new Date(expiresAt).getTime();
+  const diffMs = expiryTime - now;
+
+  // If already expired
+  if (diffMs <= 0) {
+    return "Rental Expired";
+  }
+
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays > 0) {
+    return `Expires in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
+  }
+
+  if (diffHours > 0) {
+    return `Expires in ${diffHours} hour${diffHours > 1 ? "s" : ""}`;
+  }
+
+  const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
+  return `Expires in ${diffMinutes} min${diffMinutes > 1 ? "s" : ""}`;
+};

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -8,7 +9,7 @@ export async function POST(
   try {
     const { userId } = await params;
     const body = await request.json();
-    const { payoutMethod, accountHolderName, accountNumber, ifscCode, upiId } =
+    const { payoutMethod, accountHolder, accountNumber, ifscCode, upiId } =
       body;
 
     if (!userId) {
@@ -42,7 +43,7 @@ export async function POST(
         );
       }
     } else if (payoutMethod === "bank" || accountNumber || ifscCode) {
-      if (!accountNumber || !ifscCode || !accountHolderName) {
+      if (!accountNumber || !ifscCode || !accountHolder) {
         return NextResponse.json(
           { success: false, message: "All bank detail fields are required" },
           { status: 400 },
@@ -66,9 +67,16 @@ export async function POST(
         userId,
         payoutMethod: resolvedMethod,
         upiId: resolvedMethod === "UPI" ? upiId : null,
-        accountHolderName: resolvedMethod === "BANK" ? accountHolderName : null,
+        accountHolderName: resolvedMethod === "BANK" ? accountHolder : null,
         accountNumber: resolvedMethod === "BANK" ? accountNumber : null,
         ifscCode: resolvedMethod === "BANK" ? ifscCode : null,
+      },
+    });
+
+    const client = await clerkClient();
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        role: "CREATOR",
       },
     });
 

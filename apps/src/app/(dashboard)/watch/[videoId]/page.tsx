@@ -13,7 +13,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
   const { videoId } = await params;
 
   return (
-    <main className="mx-auto px-4 py-8 space-y-6">
+    <main className="px-4 py-8 space-y-6">
       <Suspense
         fallback={
           <div className="w-full aspect-video rounded-xl bg-muted/40 flex items-center justify-center">

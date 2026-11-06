@@ -3,18 +3,31 @@
 
 import React from "react";
 import Image from "next/image";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 import WalletBalanceCard from "@/features/wallet/components/WalletbalanceCard";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
+
+// 1. Centralized Route Title Dictionary: Add or customize any route label here easily
+const ROUTE_TITLES: Record<string, string> = {
+  home: "Overview",
+  channel: "Discover Channels",
+  "pur-vid": "Purchased Videos",
+  studio: "Creator Studio",
+  wallet: "My Wallet",
+  settings: "Account Settings",
+  watch: "Streaming Place",
+};
 
 export const AppHeader = () => {
   const pathname = usePathname();
   const { state, isMobile, toggleSidebar } = useSidebar();
 
-  // Extract and format route title cleanly (e.g., "studio-dashboard" -> "Studio Dashboard")
-  const rawRouteName = pathname.split("/")[1] || "overview";
-  const formattedTitle = rawRouteName.replace(/-/g, " ");
+  // 2. Extract current route segment (e.g. "/channel/123" -> "channel")
+  const rawRouteKey = pathname.split("/")[1] || "overview";
+
+  // 3. Resolve title from dictionary or fallback to formatted slug
+  const pageTitle = ROUTE_TITLES[rawRouteKey] || rawRouteKey.replace(/-/g, " ");
 
   const isWalletPage = pathname.includes("wallet");
 
@@ -23,28 +36,25 @@ export const AppHeader = () => {
       {/* Left Section: Sidebar Trigger & Dynamic Page Title */}
       <div className="flex items-center gap-3">
         {/* Sidebar Toggle Trigger or Custom Brand Trigger */}
-        {state === "collapsed" ||
-          (isMobile && (
-            <Button
-              variant={"link"}
-              onClick={toggleSidebar}
-              className="relative size-7 overflow-hidden rounded-lg focus:outline-none cursor-pointer"
-            >
-              <Image
-                src="/vercel.svg"
-                alt="Platform Logo"
-                fill
-                className="object-contain"
-              />
-            </Button>
-          ))}
+        {(state === "collapsed" || isMobile) && (
+          <Button
+            variant={"link"}
+            onClick={toggleSidebar}
+            className="relative size-7 overflow-hidden rounded-lg focus:outline-none cursor-pointer"
+          >
+            <Image
+              src="/vercel.svg"
+              alt="Platform Logo"
+              fill
+              className="object-contain"
+            />
+          </Button>
+        )}
 
         <div className="flex items-center gap-2">
           <span className="h-4 w-px bg-border/60 hidden sm:inline-block" />
           <h1 className="font-semibold capitalize text-base sm:text-lg tracking-tight text-foreground">
-            {formattedTitle === "channel"
-              ? "Discover Channels"
-              : formattedTitle}
+            {pageTitle}
           </h1>
         </div>
       </div>
