@@ -35,7 +35,16 @@ export async function GET(
         },
         purchases: userId
           ? {
-              where: { userId: userId },
+              where: {
+                userId: userId,
+                OR: [
+                  { accessType: "RENT", expiresAt: { gt: new Date() } },
+                  {
+                    accessType: "LIFETIME",
+                    expiresAt: null,
+                  },
+                ],
+              },
             }
           : false,
       },
@@ -66,6 +75,7 @@ export async function GET(
       description: video.description,
       thumbnailUrl: video.thumbnailUrl,
       createdAt: video.createdAt,
+      duration: video.duration,
       muxPlaybackId: canViewPlayback ? video.muxPlaybackId : null,
       isLocked: !canViewPlayback,
     };

@@ -1,97 +1,161 @@
 // components/channel/VideoCard.tsx
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChannelVideoProps } from "@/features/channel/types/types";
 import Image from "next/image";
-import React from "react";
-import { CoinsIcon } from "lucide-react";
-import { formatTimeAgo } from "@/lib/dateFormated";
+import React, { useState } from "react";
+import { CoinsIcon, LockIcon, LockOpenIcon, Clock } from "lucide-react";
+import { formatTimeAgo, formatVideoExpiry } from "@/lib/dateFormated";
 import { cn } from "cn";
 import { useRouter } from "next/navigation";
+import MultiUseDialog from "@/features/components/MultiUseDialog";
+import { WalletPayModal } from "@/features/wallet/components/walletPayModel";
 
 interface VideoCardProps {
   video: ChannelVideoProps;
+  userId?: string;
   intro?: boolean;
   onClick?: () => void;
 }
 
-const VideoCard = ({ video, intro, onClick }: VideoCardProps) => {
+const VideoCard = ({ video, intro, userId }: VideoCardProps) => {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
   const formattedRent = Number(video.rentPrice || 0).toFixed(2);
   const formattedBuy = video.buyPrice
     ? Number(video.buyPrice).toFixed(2)
     : null;
-  const router = useRouter();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!video.isPurchased) {
+      setOpen(true);
+    } else {
+      router.push(`/watch/${video.id}`);
+    }
+  };
+
   return (
-    <Card
-      onClick={() => router.push(`/watch/${video.id}`)}
-      className={cn(
-        "group flex flex-col  w-full overflow-hidden px-2 py-2 sm:p-2 border-none bg-transparent shadow-none hover:bg-muted-foreground/10 cursor-pointer rounded-xl ring-0 gap-2.5 transition-all",
-        intro && "sm:flex-row",
-      )}
-    >
-      {/* 16:9 Thumbnail Container */}
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden">
-        <Image
-          src={video.thumbnailUrl || "/placeholder-thumbnail.png"}
-          alt={video.title}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, (max-width: 1536px) 25vw, 20vw"
-          draggable={false}
-          className="object-cover"
-        />
-
-        {/* Intro Badge */}
-        {intro && (
-          <div className="absolute top-2 left-2 z-10">
-            <Badge className="bg-indigo-600/90 hover:bg-indigo-600 text-white border-none text-[10px] px-2 py-0.5 backdrop-blur-md flex items-center gap-1 shadow-sm">
-              channel Intro
-            </Badge>
-          </div>
+    <>
+      <Card
+        onClick={handleCardClick}
+        className={cn(
+          "group flex flex-col w-full overflow-hidden ring-0 p-3 border border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/80 cursor-pointer rounded-2xl shadow-xl transition-all duration-300 gap-3 backdrop-blur-sm",
+          intro && "sm:flex-row",
         )}
+      >
+        {/* 16:9 Thumbnail Container */}
+        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black/40 border border-zinc-800/60">
+          <Image
+            src={video.thumbnailUrl || "/placeholder-thumbnail.png"}
+            alt={video.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            draggable={false}
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
 
-        {/* Duration Chip (YouTube Style) */}
-        {video.duration && (
-          <div className="absolute bottom-2 right-2 z-10 bg-black/80 text-white text-[11px] font-semibold px-1.5 py-0.5 rounded backdrop-blur-xs tracking-wide">
-            {Math.floor(video.duration / 60)}:
-            {Math.floor(video.duration % 60)
-              .toString()
-              .padStart(2, "0")}
-          </div>
-        )}
-      </div>
-
-      {/* Metadata Section */}
-      <CardContent className="px-2 pb-2 sm:py-2 space-y-1 w-full">
-        <h3 className="font-semibold text-sm sm:text-base tracking-tight line-clamp-2 text-foreground group-hover:text-primary transition-colors leading-snug">
-          {video.title}
-        </h3>
-
-        <p className="text-xs text-muted-foreground line-clamp-1 leading-normal">
-          {video.description || "No description provided."}
-        </p>
-
-        {/* Details & Monetization Badges */}
-        <div className="flex items-center md:space-y-2 md:flex-col md:items-start justify-between sm:justify-start text-xs text-muted-foreground pt-1">
-          {video.createdAt && (
-            <span className="text-[12px]">
-              {formatTimeAgo(video.createdAt)}
-            </span>
+          {/* Intro Badge */}
+          {intro && (
+            <div className="absolute top-2.5 left-2.5 z-10">
+              <Badge className="bg-[#C6A15B] text-black font-semibold border-none text-[10px] px-2.5 py-0.5 shadow-md">
+                Intro
+              </Badge>
+            </div>
           )}
 
-          <div className="flex items-center gap-1.5 ml-auto md:ml-0">
-            {video.rentPrice !== undefined && (
-              <p className="flex items-center tracking-wider gap-2">
-                Rent:
-                <span className="inline-flex items-center font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded text-[11px] gap-2">
-                  <CoinsIcon className="size-4 text-[#C6A15B]" />
-                  {formattedRent}
-                </span>
-              </p>
+          {/* Lock / Unlock Status Badge */}
+          <div className="absolute top-2.5 right-2.5 z-10">
+            {!video.isPurchased ? (
+              <Badge className="bg-zinc-900/80 hover:bg-zinc-900 text-zinc-300 border border-zinc-700/60 backdrop-blur-md p-1.5 shadow-md">
+                <LockIcon className="size-3.5 text-[#C6A15B]" />
+              </Badge>
+            ) : (
+              <Badge className="bg-emerald-950/80 hover:bg-emerald-950 text-emerald-400 border border-emerald-500/30 backdrop-blur-md p-1.5 shadow-md">
+                <LockOpenIcon className="size-3.5 text-emerald-400" />
+              </Badge>
             )}
           </div>
+
+          {/* Duration Chip */}
+          {video.duration && (
+            <div className="absolute bottom-2.5 right-2.5 z-10 bg-black/80 text-white text-[11px] font-medium px-2 py-0.5 rounded-md backdrop-blur-md tracking-wide border border-white/10">
+              {Math.floor(video.duration / 60)}:
+              {Math.floor(video.duration % 60)
+                .toString()
+                .padStart(2, "0")}
+            </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Metadata Section */}
+        <CardContent className="p-0 space-y-2.5 w-full">
+          <div className="space-y-1">
+            <h3 className="font-semibold text-sm sm:text-base tracking-tight line-clamp-2 text-white group-hover:text-[#C6A15B] transition-colors leading-snug">
+              {video.title}
+            </h3>
+
+            <p className="text-xs text-zinc-400 line-clamp-1 leading-normal font-light">
+              {video.description || "No description provided."}
+            </p>
+          </div>
+
+          {/* Pricing or Expiry Status Footer */}
+          <div className="flex items-end justify-between pt-2 border-t border-zinc-800/80 text-xs">
+            {!video.isPurchased ? (
+              <div className="flex items-center md:flex-col md:items-start gap-3">
+                {video.rentPrice !== undefined && (
+                  <span className="inline-flex items-center font-medium text-[#C6A15B] bg-[#C6A15B]/10 px-2.5 py-1 rounded-md border border-[#C6A15B]/20 gap-1.5 text-xs">
+                    <CoinsIcon className="size-3.5" />
+                    Rent: ₹{formattedRent}
+                  </span>
+                )}
+                {video.buyPrice !== undefined && Number(formattedBuy) >= 1 && (
+                  <span className="inline-flex items-center font-medium text-zinc-300 bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-700/60 gap-1.5 text-xs">
+                    Buy: ₹{formattedBuy}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div className="inline-flex items-center font-medium text-[#C6A15B] bg-[#C6A15B]/10 px-2.5 py-1 rounded-md border border-[#C6A15B]/20 gap-1.5 text-xs">
+                Alreay Purchased
+              </div>
+            )}
+
+            {video.createdAt && (
+              <span className="text-[11px] text-zinc-500 font-medium">
+                {formatTimeAgo(video.createdAt)}
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Purchase Modal Dialog */}
+      {!video.isPurchased && (
+        <MultiUseDialog
+          title={`Unlock ${video.title}`}
+          description="Rent or buy this content to unlock instant HD playback."
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <WalletPayModal
+            amount={Number(video.rentPrice)}
+            title={`Unlock: ${video.title}`}
+            type="VIDEO_PURCHASE"
+            userId={userId as string}
+            onSuccess={() => {
+              setOpen(false);
+              router.push(`/watch/${video.id}`);
+            }}
+            targetId={video.id}
+          />
+        </MultiUseDialog>
+      )}
+    </>
   );
 };
 

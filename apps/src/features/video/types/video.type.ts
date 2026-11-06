@@ -38,5 +38,6 @@ export interface VideoProps {
   thumbnailUrl: string;
   rentPrice: string;
   buyPrice: string;
+  duration: number;
   isLocked: boolean;
 }

@@ -48,7 +48,7 @@ export const LeaveChannelModal: React.FC<LeaveChannelModalProps> = ({
   };
 
   return (
-    <div className="p-6 rounded-3xl bg-card border border-border/40 shadow-2xl max-w-xl w-full space-y-6">
+    <div className="p-6 rounded-3xl bg-card border border-border/40 shadow-2xl space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="p-3 rounded-2xl bg-destructive/10 text-destructive">

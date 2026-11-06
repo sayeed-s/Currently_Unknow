@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
-    // 1. Fetch all channels and conditionally check if the user is in the channel's `user` relation
+    // 1. Fetch all channels along with their creator info and subscriber check
     const channels = await prisma.channel.findMany({
       select: {
         id: true,
@@ -15,7 +15,17 @@ export async function GET(request: NextRequest) {
         bio: true,
         channelImage: true,
         joiningPrice: true,
-        // Efficiently checks if the specific user ID exists in this channel's members list
+        // Fetch creator details to verify ownership
+        creator: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+        // Checks if the specific user ID exists in this channel's members list
         user: userId
           ? {
               where: { clerkId: userId },
@@ -25,12 +35,22 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 2. Map the data to add a clean `isSubscribed` boolean flag for each channel
+    // 2. Map the data to add `isCreator` and automatic `isSubscribed` override
     const channelsWithStatus = channels.map((channel) => {
-      const { user, ...channelData } = channel;
+      const { user, creator, ...channelData } = channel;
+
+      // Check if the requesting user is the creator/owner of this channel
+      const creatorClerkId = creator?.user?.clerkId;
+      const isCreator = Boolean(userId && creatorClerkId === userId);
+
+      // Creator is automatically subscribed/unlocked without payment
+      const isSubscribed =
+        isCreator || (userId ? Array.isArray(user) && user.length > 0 : false);
+
       return {
         ...channelData,
-        isSubscribed: userId ? Array.isArray(user) && user.length > 0 : false,
+        isCreator,
+        isSubscribed,
       };
     });
 

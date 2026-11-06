@@ -25,66 +25,67 @@ export async function GET(
           where: {
             userId: stdId,
           },
+          include: {
+            channels: {
+              // 👈 Directly fetches the single unique channel belonging to this creator
+              select: {
+                id: true,
+                channelName: true,
+                bio: true,
+                channelImage: true,
+                channelPoster: true,
+                joiningPrice: true,
+              },
+            },
+          },
         });
 
         if (!creator) {
           throw new Error("STUDIO_NOT_FOUND");
         }
 
-        // 2. Fetch all channels belonging to this creator
-        const channels = await tx.channel.findUnique({
-          where: {
-            creatorId: creator.id,
-          },
-          select: {
-            id: true,
-            channelName: true,
-            bio: true,
-            channelImage: true,
-            channelPoster: true,
-            joiningPrice: true,
-          },
-        });
+        const channel = creator.channels;
+        const channelId = channel?.id;
 
-        // 3. Fetch videos across all channels ordered by recent creation date
-        const rawVideos = await tx.video.findMany({
-          where: {
-            channelId: channels?.id,
-          },
-          select: {
-            id: true,
-            title: true,
-            isPublished: true,
-            description: true,
-            thumbnailUrl: true,
-            createdAt: true,
-            channelId: true,
-            rentPrice: true,
-            buyPrice: true,
-            isIntro: true,
-            purchases: {
-              select: {
-                pricePaid: true,
+        // 2. Fetch videos strictly belonging to this creator's single channel (if created)
+        const rawVideos = channelId
+          ? await tx.video.findMany({
+              where: {
+                channelId: channelId,
               },
-            },
-          },
-          orderBy: {
-            createdAt: "desc", // Global recent order across all channels
-          },
-          take: 10, // Optional: limit total recent videos fetched
-        });
+              select: {
+                id: true,
+                title: true,
+                isPublished: true,
+                description: true,
+                thumbnailUrl: true,
+                createdAt: true,
+                channelId: true,
+                rentPrice: true,
+                buyPrice: true,
+                isIntro: true,
+                purchases: {
+                  select: {
+                    pricePaid: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: "desc",
+              },
+              take: 10,
+            })
+          : [];
 
         let totalStudioEarnings = 0;
 
         const videos = rawVideos.map((video) => {
-          // Sum up all purchase amounts for this specific video
           const videoEarnings = video.purchases.reduce((sum, purchase) => {
             return sum + Number(purchase.pricePaid || 0);
           }, 0);
 
           totalStudioEarnings += videoEarnings;
 
-          // Return video object with computed earnings & purchase count (omit raw purchases array if desired)
           return {
             id: video.id,
             title: video.title,
@@ -97,12 +98,12 @@ export async function GET(
             isIntro: video.isIntro,
             buyPrice: video.buyPrice,
             totalPurchases: video.purchases.length,
-            totalEarnings: videoEarnings, // 💰 Computed earnings for this video
+            totalEarnings: videoEarnings,
           };
         });
 
         return {
-          channels,
+          channels: channel || null, // Matches your frontend expectation: data.studio_data.channels
           videos,
           totalStudioEarnings,
         };
@@ -119,9 +120,7 @@ export async function GET(
         message: "Studio data fetched successfully",
         studio_data: studio,
       },
-      {
-        status: 200,
-      },
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("Error while fetching the studio data:", error);

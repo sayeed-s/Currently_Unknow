@@ -40,15 +40,15 @@ export const WalletPayModal: React.FC<WalletPayModalProps> = ({
         onSuccess();
       }
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || "Payment failed";
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message || "Payment failed";
+      toast.error(errorMessage,error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="p-6 rounded-3xl bg-card border border-border/40 shadow-2xl max-w-xl min-w-sm space-y-6">
+    <div className="p-6 rounded-3xl bg-card border border-border/40 shadow-2xl space-y-6">
       <div className="flex items-center gap-3">
         <div className="p-3 rounded-2xl bg-primary/10 text-primary">
           <Wallet className="w-6 h-6" />

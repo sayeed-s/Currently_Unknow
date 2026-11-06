@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import {
+  FilmIcon,
   HomeIcon,
   KeyboardMusicIcon,
   PlusIcon,
@@ -44,6 +45,11 @@ const menuItems = [
         title: "Channels",
         icon: TvMinimalIcon,
         url: "/channel",
+      },
+      {
+        title: "Purchase Videos",
+        icon: FilmIcon,
+        url: "/pur-vid",
       },
       {
         title: "Search",

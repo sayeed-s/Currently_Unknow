@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatTimeAgo } from "@/lib/dateFormated";
+import { formatAmount } from "@/lib/currencyFormator";
 
 const WalletBalanceCard = ({
   type = "wallet",
@@ -73,7 +74,7 @@ const WalletBalanceCard = ({
         <CardContent className="p-0 flex items-center gap-2 justify-center text-sm font-medium">
           <CoinsIcon className="size-5 text-[#C6A15B]" />
           <span className="font-semibold">
-            {isLoading ? "..." : balance.toFixed(2)}
+            {isLoading ? "..." : formatAmount(balance)}
           </span>
         </CardContent>
       </Card>
@@ -86,7 +87,7 @@ const WalletBalanceCard = ({
       {/* Left Column: Premium Card & Top Up Form */}
       <div className="w-full max-w-md space-y-6">
         {/* Premium Credit Card Styling */}
-        <Card className="w-full bg-linear-to-br from-neutral-900 via-neutral-950 to-zinc-900 text-white border-neutral-800/80 shadow-2xl relative overflow-hidden flex flex-col justify-between p-6 rounded-2xl aspect-4.5/2">
+        <Card className="w-full bg-linear-to-br from-neutral-900 via-neutral-950 to-zinc-900 text-white border-neutral-800/80 shadow-2xl relative overflow-hidden flex flex-col justify-between p-6 rounded-2xl aspect-4/2">
           {/* Background Decorative Gold Glow */}
           <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C6A15B]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -102,7 +103,7 @@ const WalletBalanceCard = ({
                 {isLoading ? (
                   <Skeleton className="h-8 w-32 bg-zinc-800" />
                 ) : (
-                  <span>{balance.toFixed(2)}</span>
+                  <span>{formatAmount(balance)}</span>
                 )}
               </div>
             </div>

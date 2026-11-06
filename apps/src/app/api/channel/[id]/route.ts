@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const userId = searchParams.get("userId"); // Clerk User ID
 
     if (!id) {
       return NextResponse.json(
@@ -30,6 +30,15 @@ export async function GET(
         channelImage: true,
         createdAt: true,
         joiningPrice: true,
+        creator: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
         user: userId
           ? {
               where: { clerkId: userId },
@@ -49,24 +58,32 @@ export async function GET(
       );
     }
 
-    const { user, ...channelData } = rawChannel;
-    const isSubscribed = userId
-      ? Array.isArray(user) && user.length > 0
-      : false;
+    const { user, creator, ...channelData } = rawChannel;
+
+    // Check if the requesting user is the owner/creator of this channel
+    const creatorClerkId = creator?.user?.clerkId;
+    const isCreator = Boolean(userId && creatorClerkId === userId);
+
+    // Subscribed if they are the creator OR if they exist in the members relation
+    const isSubscribed = isCreator || (Array.isArray(user) && user.length > 0);
 
     return NextResponse.json(
       {
         success: true,
-        message: "Channel Details",
+        message: "Channel Details retrieved successfully",
         channel: {
           ...channelData,
+          isCreator,
           isSubscribed,
         },
       },
       { status: 200 },
     );
   } catch (error: any) {
-    console.error("Error while getting channel details:", error.message);
+    console.error(
+      "Error while getting channel details:",
+      error?.message || error,
+    );
     return NextResponse.json(
       {
         success: false,

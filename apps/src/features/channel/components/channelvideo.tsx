@@ -50,7 +50,11 @@ const ChannelVideo: React.FC<ChannelVideoProps> = ({ channelId }) => {
       {introVideo && (
         <div className="space-y-3 pb-8 border-b border-border/40">
           <div className="max-w-4xl">
-            <VideoCard video={introVideo} intro={true} />
+            <VideoCard
+              userId={userId as string}
+              video={introVideo}
+              intro={true}
+            />
           </div>
         </div>
       )}
@@ -67,7 +71,12 @@ const ChannelVideo: React.FC<ChannelVideoProps> = ({ channelId }) => {
           {/* Responsive YouTube Grid Breakpoints */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 gap-y-8">
             {regularVideos.map((vid) => (
-              <VideoCard key={vid.id} video={vid} intro={false} />
+              <VideoCard
+                userId={userId as string}
+                key={vid.id}
+                video={vid}
+                intro={false}
+              />
             ))}
           </div>
         </div>
