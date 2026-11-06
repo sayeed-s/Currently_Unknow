@@ -17,7 +17,7 @@ export async function CreateChannel({
   channelImagePublicId,
   channelPosterPublicId,
 }: ChannelFormValues) {
-  const response = await api.post("/channel", {
+  const response = await api.post("/studio/channel", {
     userId,
     channelName,
     bio,

@@ -6,9 +6,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id } = await params; // Channel ID
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const userId = searchParams.get("userId"); // Clerk ID
 
     if (!id || !userId) {
       return NextResponse.json(
@@ -20,15 +20,36 @@ export async function GET(
       );
     }
 
-    // 1. Fetch internal User ID if userId passed is a clerkId
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId },
-      select: { clerkId: true },
+    // 1. Fetch channel details to see who owns it (creator's clerkId)
+    const channel = await prisma.channel.findUnique({
+      where: { id },
+      select: {
+        creator: {
+          select: {
+            user: {
+              select: {
+                clerkId: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    const targetUserId = user?.clerkId || userId;
+    if (!channel) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Channel not found",
+        },
+        { status: 404 },
+      );
+    }
 
-    // 2. Fetch videos with filtered user purchases and progress
+    const creatorClerkId = channel.creator?.user?.clerkId;
+    const isCreator = Boolean(creatorClerkId && creatorClerkId === userId);
+
+    // 2. Fetch channel videos along with purchases and progress for the user
     const rawVideos = await prisma.video.findMany({
       where: {
         channelId: id,
@@ -45,7 +66,7 @@ export async function GET(
         thumbnailUrl: true,
         videoProgress: {
           where: {
-            userId: targetUserId,
+            userId: userId,
           },
           select: {
             lastSeen: true,
@@ -54,7 +75,7 @@ export async function GET(
         },
         purchases: {
           where: {
-            userId: targetUserId,
+            userId: userId,
           },
           select: {
             id: true,
@@ -69,34 +90,40 @@ export async function GET(
 
     const now = new Date();
 
-    // 3. Process video items and calculate valid active purchase state
+    // 3. Process video items and calculate valid access state (Creator gets instant access)
     const videos = rawVideos.map((video) => {
       const activePurchase = video.purchases[0] || null;
 
-      // Check if purchase exists AND is not expired
-      const isPurchased =
+      // Check if user has an active purchase/rental
+      const hasValidPurchase =
         !!activePurchase &&
         (!activePurchase.expiresAt || new Date(activePurchase.expiresAt) > now);
+
+      // If the user is the creator of the channel OR has purchased it, grant full access
+      const isPurchased = isCreator || hasValidPurchase;
 
       const { purchases, ...videoData } = video;
 
       return {
         ...videoData,
         isPurchased,
-        purchaseExpiresAt: activePurchase?.expiresAt || null,
+        purchaseExpiresAt: isCreator ? null : activePurchase?.expiresAt || null,
       };
     });
 
     return NextResponse.json(
       {
         success: true,
-        message: "Channel Videos",
+        message: "Channel Videos fetched successfully",
         videos,
       },
       { status: 200 },
     );
   } catch (error: any) {
-    console.error("Error while fetching channel videos:", error.message);
+    console.error(
+      "Error while fetching channel videos:",
+      error?.message || error,
+    );
     return NextResponse.json(
       {
         success: false,

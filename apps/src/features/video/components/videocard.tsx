@@ -137,7 +137,7 @@ const VideoCard = ({ video, intro, userId }: VideoCardProps) => {
       {/* Purchase Modal Dialog */}
       {!video.isPurchased && (
         <MultiUseDialog
-          title="Unlock Video Masterclass"
+          title={`Unlock ${video.title}`}
           description="Rent or buy this content to unlock instant HD playback."
           open={open}
           onOpenChange={setOpen}

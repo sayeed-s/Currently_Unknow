@@ -36,4 +36,5 @@ export interface StudioChnnelProps {
   channelPoster: string;
   joiningPrice: string;
   isSubscribed: boolean;
+  isCreator: boolean;
 }

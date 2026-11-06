@@ -8,6 +8,7 @@ import VideoPlayer from "./videoPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, Film, Clock, AlertCircle, ShieldAlert } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
+import { formatDuration } from "@/lib/duration";
 
 interface VideoCardPageProps {
   videoId: string;
@@ -93,7 +94,7 @@ const VideoCardPage: React.FC<VideoCardPageProps> = ({ videoId }) => {
               <div className="flex items-center gap-2 text-xs text-zinc-400">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 font-medium">
                   <Clock className="w-3.5 h-3.5 text-[#C6A15B]" />
-                  {Math.round(duration)} mins runtime
+                  {formatDuration(duration)} runtime
                 </span>
               </div>
             )}

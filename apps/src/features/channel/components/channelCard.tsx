@@ -27,6 +27,7 @@ const ChannelCard = ({ channel, studio, userId }: ChannelCardProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     channel.isSubscribed || false,
   );
+  const [isCreator, setIsCreator] = useState(channel.isCreator || false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
@@ -105,9 +106,8 @@ const ChannelCard = ({ channel, studio, userId }: ChannelCardProps) => {
             </p>
           </div>
         </div>
-
         {/* Action Button / Pricing */}
-        {!studio ? (
+        {!studio && !isCreator && (
           <Button
             onClick={handleChnJoin}
             disabled={isLoading}
@@ -141,7 +141,8 @@ const ChannelCard = ({ channel, studio, userId }: ChannelCardProps) => {
               )}
             </span>
           </Button>
-        ) : (
+        )}{" "}
+        {studio && (
           <div className="text-sm font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-muted/40 border border-border/40 flex items-center gap-1.5">
             {price <= 0 ? (
               "Free Joining"

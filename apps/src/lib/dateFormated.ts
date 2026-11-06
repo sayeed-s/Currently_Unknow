@@ -58,16 +58,19 @@ export const formatVideoExpiry = (expiresAt: Date | string | null): string => {
   }
 
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
 
-  if (diffDays > 0) {
+  // If greater than 72 hours, display in days
+  if (diffHours > 72) {
+    const diffDays = Math.floor(diffHours / 24);
     return `Expires in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
   }
 
+  // Display in hours for <= 72 hours (e.g., 48 hours, 12 hours)
   if (diffHours > 0) {
     return `Expires in ${diffHours} hour${diffHours > 1 ? "s" : ""}`;
   }
 
+  // Fallback to minutes if under 1 hour remaining
   const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
   return `Expires in ${diffMinutes} min${diffMinutes > 1 ? "s" : ""}`;
 };

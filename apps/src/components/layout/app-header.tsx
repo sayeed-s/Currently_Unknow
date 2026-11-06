@@ -36,7 +36,7 @@ export const AppHeader = () => {
       {/* Left Section: Sidebar Trigger & Dynamic Page Title */}
       <div className="flex items-center gap-3">
         {/* Sidebar Toggle Trigger or Custom Brand Trigger */}
-        {(state === "collapsed" || isMobile) && (
+        {isMobile && (
           <Button
             variant={"link"}
             onClick={toggleSidebar}
