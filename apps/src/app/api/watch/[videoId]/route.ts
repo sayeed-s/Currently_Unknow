@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { searchParams } = new URL(request.url);
     const { videoId } = await params;
-    const userId = searchParams.get("userId");
+    const userId = searchParams.get("userId"); // string or null
 
     if (!videoId) {
       return NextResponse.json(
@@ -17,21 +17,18 @@ export async function GET(
       );
     }
 
-    const creator = await prisma.creatorProfile.findUnique({
-      where: {
-        userId: userId as string,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    // 1. Fetch the video along with its channel owner and purchase records
+    // 1. Fetch video, channel owner profile, and user purchases in a single efficient query
     const video = await prisma.video.findUnique({
       where: { id: videoId },
       include: {
         channel: {
-          select: { creatorId: true }, // Channel owner's user ID
+          select: {
+            creator: {
+              select: {
+                userId: true, // Clerk/Auth User ID of the creator
+              },
+            },
+          },
         },
         purchases: userId
           ? {
@@ -45,6 +42,10 @@ export async function GET(
                   },
                 ],
               },
+              orderBy: {
+                createdAt: "desc",
+              },
+              take: 1,
             }
           : false,
       },
@@ -57,18 +58,20 @@ export async function GET(
       );
     }
 
-    // 2. Check Access Permissions
-    const isOwner = userId && video.channel.creatorId === creator?.id;
-    const hasPurchased = video.purchases && video.purchases.length > 0;
-    // Assuming you have a boolean or pricing flag. If rentPrice/buyPrice are 0 or null, it's free:
+    // 2. Check Access Permissions safely
+    const creatorUserId = video.channel?.creator?.userId;
+    const isOwner = Boolean(
+      userId && creatorUserId && userId === creatorUserId,
+    );
+    const hasPurchased = Boolean(video.purchases && video.purchases.length > 0);
+
     const isFree =
       (!video.rentPrice || Number(video.rentPrice) === 0) &&
       (!video.buyPrice || Number(video.buyPrice) === 0);
 
-    // If it's not free, user hasn't purchased it, and user isn't the owner -> block access to muxPlaybackId
     const canViewPlayback = isOwner || isFree || hasPurchased;
 
-    // 3. Construct response (hide muxPlaybackId if unauthorized)
+    // 3. Construct response
     const responseData = {
       id: video.id,
       title: video.title,
@@ -89,7 +92,10 @@ export async function GET(
       { status: 200 },
     );
   } catch (error: any) {
-    console.error("Error while getting the video details", error.message);
+    console.error(
+      "Error while getting the video details",
+      error?.message || error,
+    );
     return NextResponse.json(
       { success: false, message: "Internal Network Error while Fetching Data" },
       { status: 500 },

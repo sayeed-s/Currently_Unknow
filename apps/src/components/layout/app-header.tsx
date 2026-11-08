@@ -7,6 +7,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import WalletBalanceCard from "@/features/wallet/components/WalletbalanceCard";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
+import { FullscreenToggleButton } from "./fullscreenBtn";
 
 // 1. Centralized Route Title Dictionary: Add or customize any route label here easily
 const ROUTE_TITLES: Record<string, string> = {
@@ -66,6 +67,7 @@ export const AppHeader = () => {
             <WalletBalanceCard type="Badge" />
           </div>
         )}
+        <FullscreenToggleButton />
       </div>
     </header>
   );
