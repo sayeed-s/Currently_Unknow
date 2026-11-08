@@ -8,6 +8,8 @@ export async function POST(request: NextRequest) {
     // type: "VIDEO_PURCHASE" or "CHANNEL_JOIN"
     // targetId: videoId or channelId
 
+    console.log(amount, userId, targetId, type);
+
     if (!userId || !targetId || !type || amount === undefined) {
       return NextResponse.json(
         { success: false, message: "Missing required fields" },

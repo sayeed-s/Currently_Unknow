@@ -37,6 +37,8 @@ model User {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   premiumUser    Boolean         @default(false)
+  isDeleted      Boolean         @default(false)
+  isActive       Boolean         @default(true)
   channel        Channel[]
 
   @@index([clerkId])
@@ -89,6 +91,8 @@ model CreatorProfile {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  isActive Boolean @default(true)
+
   @@index([userId])
   @@map("creator_profile")
 }
@@ -109,6 +113,7 @@ model Channel {
   updatedAt             DateTime        @updatedAt
   posts                 CommunityPost[]
   user                  User[]
+  isActive              Boolean         @default(true)
 
   @@index([creatorId])
   @@map("channels")
@@ -142,6 +147,8 @@ model Video {
 
   purchases     Purchase[]
   videoProgress VideoProgress[]
+
+  isDeleted Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

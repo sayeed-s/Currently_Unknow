@@ -47,7 +47,7 @@ const menuItems = [
         url: "/channel",
       },
       {
-        title: "Purchase Videos",
+        title: "Purchased Videos",
         icon: FilmIcon,
         url: "/pur-vid",
       },

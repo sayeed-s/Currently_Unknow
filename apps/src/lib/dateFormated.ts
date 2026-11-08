@@ -37,10 +37,9 @@ export function formatTimeAgo(dateInput: string | Date): string {
   return "Just now";
 }
 
-export function GenrateExpiry() {
-  const date = new Date();
-  date.setHours(date.getHours() + 48);
-  return date;
+export function GenrateExpiry(hours: number = 720): Date {
+  const expiryTime = new Date().getTime() + hours * 60 * 60 * 1000;
+  return new Date(expiryTime);
 }
 
 export const formatVideoExpiry = (expiresAt: Date | string | null): string => {

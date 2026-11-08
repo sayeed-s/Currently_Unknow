@@ -41,7 +41,7 @@ export const WalletPayModal: React.FC<WalletPayModalProps> = ({
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "Payment failed";
-      toast.error(errorMessage,error);
+      toast.error(errorMessage, error);
     } finally {
       setIsLoading(false);
     }

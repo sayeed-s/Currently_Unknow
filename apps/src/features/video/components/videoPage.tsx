@@ -6,9 +6,10 @@ import { useQuery } from "@tanstack/react-query";
 import { VideoDetails } from "@/features/actions/video.action";
 import VideoPlayer from "./videoPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Film, Clock, AlertCircle, ShieldAlert } from "lucide-react";
+import { Loader2, Clock, ShieldAlert, AlertCircle } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { formatDuration } from "@/lib/duration";
+import Image from "next/image";
 
 interface VideoCardPageProps {
   videoId: string;
@@ -38,7 +39,7 @@ const VideoCardPage: React.FC<VideoCardPageProps> = ({ videoId }) => {
           <h2 className="text-lg font-semibold text-white">
             Playback Unavailable
           </h2>
-          <p className="text-sm text-zinc-400 max-w-md mx-auto">
+          <p className="text-sm text-zinc-400 max-w-md mx-auto font-light">
             Failed to load video details or the rental period for this content
             has expired.
           </p>
@@ -51,32 +52,54 @@ const VideoCardPage: React.FC<VideoCardPageProps> = ({ videoId }) => {
     data.video;
 
   return (
-    <div className="space-y-8 w-full max-w-6xl mx-auto pb-12">
+    <div className="w-full max-w-6xl mx-auto pb-12">
       {/* Cinematic Theater Frame for Video Player */}
-      <div className="relative group rounded-2xl overflow-hidden shadow-2xl shadow-black/80 border border-zinc-800/80 bg-zinc-950">
+      <div className="relative group md:rounded-2xl overflow-hidden shadow-2xl shadow-black/80 border border-zinc-800/80 bg-zinc-950">
         {/* Subtle Gold Ambient Glow Effect */}
         <div className="absolute -inset-1 bg-linear-to-r from-[#C6A15B]/20 via-transparent to-[#C6A15B]/10 rounded-2xl blur-xl opacity-30 group-hover:opacity-50 transition duration-1000 pointer-events-none" />
 
         <div className="relative w-full aspect-video">
           {muxPlaybackId ? (
             <VideoPlayer
+              isPurchased
+              rentPrice={Number(data.video.rentPrice)}
+              title={title}
+              userId={userId as string}
+              videoId={videoId}
               playbackId={muxPlaybackId}
               posterUrl={thumbnailUrl || undefined}
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950/90 text-center p-6 space-y-3">
-              <div className="w-12 h-12 rounded-full bg-[#C6A15B]/10 border border-[#C6A15B]/20 flex items-center justify-center">
-                <ShieldAlert className="w-6 h-6 text-[#C6A15B]" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-white">
-                  Stream Restricted or Processing
-                </p>
-                <p className="text-xs text-zinc-400">
-                  Video is currently processing or your 48-hour rental period
-                  has expired.
-                </p>
+            <div className="w-full relative h-full flex flex-col items-center justify-center text-center p-6 space-y-3 overflow-hidden">
+              {/* Thumbnail Background with Dark Overlay */}
+              {thumbnailUrl && (
+                <>
+                  <Image
+                    src={thumbnailUrl}
+                    alt={title}
+                    fill
+                    priority
+                    className="object-cover absolute inset-0 filter scale-105 opacity-70"
+                  />
+                  <div className="absolute inset-0 backdrop-blur-xs m-0" />
+                </>
+              )}
+
+              {/* Restricted Content Notice Card */}
+              <div className="relative z-10 flex flex-col items-center space-y-3 max-w-md mx-auto">
+                <div className="w-12 h-12 rounded-full bg-[#C6A15B]/10 border border-[#C6A15B]/30 flex items-center justify-center shadow-lg shadow-[#C6A15B]/10">
+                  <ShieldAlert className="w-6 h-6 text-[#C6A15B]" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-base font-bold text-white tracking-tight">
+                    Stream Restricted or Processing
+                  </p>
+                  <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed">
+                    Video is currently processing or your 48-hour rental period
+                    has expired. Unlock access to continue watching.
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -84,7 +107,7 @@ const VideoCardPage: React.FC<VideoCardPageProps> = ({ videoId }) => {
       </div>
 
       {/* Editorial Video Details Section */}
-      <div className="bg-zinc-900/30 border border-zinc-800/60 rounded-2xl p-6 sm:p-8 backdrop-blur-md space-y-6">
+      <div className="p-6 sm:p-8 backdrop-blur-md space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-6">
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
